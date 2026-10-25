@@ -28,3 +28,6 @@ Thumbs.db
 
 # Session files (Claude Code)
 .claude/sessions/
+
+# Hallmark skill output (screenshots, caches)
+.hallmark/
