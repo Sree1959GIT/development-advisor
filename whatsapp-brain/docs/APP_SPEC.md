@@ -27,7 +27,7 @@ modular and extensible.
 | Concern | Choice |
 |---|---|
 | Backend | Python 3.11+, FastAPI, Uvicorn, Pydantic v2 |
-| Frontend | React + TypeScript + Vite, built to static files served by FastAPI |
+| Frontend | React + TypeScript + Vite, Tailwind CSS + shadcn/ui (Radix primitives), lucide icons, TanStack Query/Table, Framer Motion; built to static files served by FastAPI |
 | Metadata DB | SQLite (SQLAlchemy/SQLModel + Alembic migrations) |
 | Vector store | LanceDB (embedded, Windows-friendly), plus SQLite FTS5 for keyword/BM25 |
 | Embeddings | Local by default via `fastembed` (ONNX, CPU); provider embeddings optional |
@@ -159,6 +159,36 @@ Dashboard (stats, last ingest), Ingest (upload, progress, delta report), Resourc
 Brains (select categories, build/update, open vault), Chat (text + voice), Settings
 (providers, models, vault path, fetch limits, voice), Logs/Jobs.
 
+### 4.11 UI/UX quality (high priority: the app must look and feel premium)
+- **Design system first**: before building screens, write `docs/DESIGN_SYSTEM.md` with
+  colour tokens (light + dark, WCAG AA contrast), typography scale (Inter or similar),
+  spacing scale, radius, elevation, motion durations, and component inventory. All UI
+  uses these tokens, with no hard-coded one-off colours or sizes.
+- **Look**: clean, modern, calm "knowledge tool" aesthetic (think Linear / Raycast /
+  Obsidian). Left sidebar navigation with icons, command palette (Ctrl+K) for every
+  action, consistent page headers, generous whitespace, subtle motion, polished empty
+  states with a clear next action, skeleton loaders (no layout jumps), toasts for
+  results, and clear error states with recovery actions.
+- **Theme**: light, dark and system modes; per-category accent colours reused in the
+  Obsidian graph.
+- **Key experiences**:
+  - Ingest: drag-and-drop, live multi-stage progress (parse → fetch → analyse →
+    classify) with counts, ETA, pause/resume, and a delta summary card at the end.
+  - Categories: card grid with counts and sample links, drag resources between
+    categories, merge/split dialogs, inline rename.
+  - Brains: visual picker of categories, preview of what will be built, and an
+    interactive knowledge-graph view (main brain ↔ category brains).
+  - Chat: streaming answers, citation chips with hover previews, brain selector,
+    suggested follow-up questions, conversation history.
+  - Voice: animated mic orb showing listening / thinking / speaking states, live
+    transcript, interrupt button, and a spoken confirmation card for actions.
+- **Usability**: fully keyboard-navigable, visible focus rings, ARIA labels, respects
+  reduced-motion, readable at 1280×720 up to 4K, sensible at 125–150 % Windows scaling.
+  Large tables are virtualized.
+- **Review**: each screen is screenshot with Playwright (light + dark) into
+  `docs/screenshots/` and reviewed against `docs/DESIGN_SYSTEM.md` and an accessibility
+  check (axe-core). Issues found are fixed before the milestone closes.
+
 ## 5. Non-functional requirements
 - **Scale**: 10,000+ URLs ingest and analysis complete without crashing; UI stays
   responsive; memory under ~2 GB excluding local models.
@@ -189,4 +219,8 @@ Brains (select categories, build/update, open vault), Chat (text + voice), Setti
    the PyInstaller app and the Inno Setup installer, silently installs it, starts it,
    and passes an HTTP `/health` smoke test; installer uploaded as a workflow artifact.
    Same tests also run on `ubuntu-latest`.
-7. README and docs complete; `git status` clean; all pushed.
+7. UI: Playwright screenshots of every screen in light and dark mode are committed under
+   `docs/screenshots/`; axe-core reports no serious or critical violations; an Opus
+   design review against `docs/DESIGN_SYSTEM.md` and section 4.11 is recorded in
+   `docs/UI_REVIEW.md` with all findings fixed.
+8. README and docs complete; `git status` clean; all pushed.
